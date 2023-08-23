@@ -3,6 +3,7 @@ import scipy
 import numpy as np
 import os
 from scipy.sparse import csr_matrix, lil_matrix
+import argparse
 
 
 def flatten(l):
@@ -59,7 +60,7 @@ def getindices(word, lines):
 
 def getmoduleinfo(path = './'):
     moduleinfo = []
-    with open(path + 'tcbn22ullbwp40p140hvt.v') as f:
+    with open(path + 'verilog_lib.v') as f:
         temp = ''
         copy = False
         for line in f:
@@ -166,7 +167,7 @@ def getlineinfo(line):
     #x = re.match(r"(([a-zA-Z0-9]+)) \\(\w+)[^\s]+ (\([\/a-zA-Z0-9\s_\),.\(\\\\\[\]]+)", line)
     #x = re.match(r"(([a-zA-Z0-9]+)) \\?(\w+)[^\s]* (\([\/a-zA-Z0-9\s_\),.\(\\\\\[\]]+)", line)
     #print(line)
-    x = re.match(r"(([a-zA-Z0-9]+))\s*\\?(\w+)[^\s]*\s*(\([\/a-zA-Z0-9\s_\'),.\(\\\\\[\]]+)", line)
+    x = re.match(r"(([a-zA-Z0-9_]+))\s*\\?(\w+)[^\s]*\s*(\([\/a-zA-Z0-9\s_\'),.\(\\\\\[\]]+)", line)
     #print(x)
     gatetype, instancename = x.group(0).split(' ')[0], x.group(0).split(' ')[1]
     label = x.group(3)
@@ -290,6 +291,7 @@ def connect(shape, infolist, lookuplist, modules, train_indices):
     adj_train = lil_matrix((shape,shape), dtype=bool)
     class_map = dict()
     membership = dict()
+    num_neighbs = np.zeros(shape)
 
     i = 0
     numtro = 0 #added
@@ -314,6 +316,8 @@ def connect(shape, infolist, lookuplist, modules, train_indices):
 
             inp, out = modules[instancename]
             if out is None:
+                membership[i] = netlist
+                i = i +1
                 continue
             for q in range(len(portnames)):
                 if portnames[q] in out:
@@ -321,28 +325,33 @@ def connect(shape, infolist, lookuplist, modules, train_indices):
                     outs.append(connection)
                     try:
                         neighbors = lookup[connection]
+                        
                         for num in neighbors:
                             adj[i, num + offset] = True
+                            adj[num + offset, i] = True
+                            num_neighbs[num+offset] = num_neighbs[num+offset]
                             if i in train_indices:
                                 adj_train[i, num + offset] = True
+                                adj_train[num + offset, i] = True
                     except KeyError:
                         primouts.append(connection)
             membership[i] = netlist
             i = i +1
         netlist += 1
+    print(i)
+    return adj, adj_train, class_map, membership, num_neighbs
 
-    return adj, adj_train, class_map, membership
 
-
-def generate_features(numnodes, gatelookup, modules, infolist, priminpslist, primoutslist, membership): #! need to fix as priminps is now list of lists!!!
+def generate_features(numnodes, gatelookup, modules, infolist, priminpslist, primoutslist, membership, num_neighbs): #! need to fix as priminps is now list of lists!!!
     connected_to_prim_out = set()
     connected_to_prim_inp = set()
 
     featsleft = np.zeros((numnodes, len(gatelookup)))
     featsright = np.zeros((numnodes, 4))
     info = [item for sublist in infolist for item in sublist]
+    print(featsleft.shape[0])
     for i in range(featsleft.shape[0]):
-        #print(i, end='\r')
+        print(i, end='\r')
         priminps = priminpslist[membership[i]]
         primouts = primoutslist[membership[i]]
 
@@ -350,8 +359,8 @@ def generate_features(numnodes, gatelookup, modules, infolist, priminpslist, pri
         featsleft[i][gatelookup[info[i][1]]] = 1
         ins = modules[info[i][0]][0]
         outs = modules[info[i][0]][1]
-        featsright[i][0] = 0 if ins is None else len(ins) / 5
-        featsright[i][1] = 0 if outs is None else len(outs) / 5
+        featsright[i][0] = 0 if ins is None else len(ins) / 10
+        featsright[i][1] = 0 if outs is None else num_neighbs[i] / 20
         connections = info[i][5]
         for conn in connections:
             if conn in priminps:
@@ -394,8 +403,6 @@ def save_output(trainindices, valindices, testindices, adj, adj_train, class_map
     import json
     from scipy.sparse import save_npz
     from tempfile import TemporaryFile
-    import pandas as pd
-    import pickle
 
     outfile = TemporaryFile()
 
@@ -404,40 +411,6 @@ def save_output(trainindices, valindices, testindices, adj, adj_train, class_map
     role['tr'] = trainindices
     role['va'] = valindices
     role['te'] = testindices
-
-    train = feats[trainindices]
-    val = feats[valindices]
-    test = feats[testindices]
-
-    train = pd.DataFrame(train)
-    val = pd.DataFrame(val)
-    test = pd.DataFrame(test)
-
-    trainlabels = []
-    vallabels = []
-    testlabels = []
-
-    for i in trainindices:
-        trainlabels.append(class_map[i])
-
-    for i in valindices:
-        vallabels.append(class_map[i])
-
-    for i in testindices:
-        testlabels.append(class_map[i])
-
-    train['y_true'] = trainlabels
-    val['y_true'] = vallabels
-    test['y_true'] = testlabels
-
-    train.to_csv('train.csv', encoding="ISO-8859-1", index = False)
-    val.to_csv('val.csv', encoding="ISO-8859-1", index = False)
-    test.to_csv('test.csv', encoding="ISO-8859-1", index = False)
-
-    targets = train.columns
-    with open('targets.pkl', 'wb') as f:
-        pickle.dump(targets, f)
-
 
     adj_full = adj.tocsr()
     adj_train = adj_train.tocsr()
@@ -466,6 +439,9 @@ def recordinfo(infolistlist, vlist):
     
 
 def main():
+
+
+
     veriloglistlist = getverilogs()
 
 
@@ -505,15 +481,12 @@ def main():
     #     print(len(n), v)
 
     lookuplist = generate_lookup(infolistlist, modules)
-    adj, adj_train, class_map, membership = connect(numnodes, infolistlist, lookuplist, modules, indices[0])
+    adj, adj_train, class_map, membership, num_neighbs = connect(numnodes, infolistlist, lookuplist, modules, indices[0])
     gatelookup = {g:i for i, g in enumerate(gates)}
     print(gates)
 
 
-
-
-
-    feats, connected_to_prim_inp, connected_to_prim_out = generate_features(numnodes, gatelookup, modules, infolistlist, priminlistlist, primoutlistlist, membership)
+    feats, connected_to_prim_inp, connected_to_prim_out = generate_features(numnodes, gatelookup, modules, infolistlist, priminlistlist, primoutlistlist, membership, num_neighbs)
 
 
     import networkx as nx
@@ -538,7 +511,7 @@ def main():
 
     feats = np.concatenate((feats, distances), axis = 1)
 
-    # nx.write_gexf(G, "test.gexf")
+    nx.write_gexf(G, "test.gexf")
 
     
 

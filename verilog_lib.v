@@ -1,14 +1,22 @@
 
 `celldefine
-module AND2X1 (A, B, Y);
-    input A, B;
-    output Y;
+module AND2X1 (IN1, IN2, Q);
+    input IN1, IN2;
+    output Q;
     
 endmodule
 `endcelldefine
 
 `celldefine
-module AND3X1 (A, B, C, Y);
+module AND3X1 (IN1, IN2, IN3, Q);
+    input IN1, IN2, IN3;
+    output Q;
+    
+endmodule
+`endcelldefine
+
+`celldefine
+module AND3X1_RS (A, B, C, Y);
     input A, B, C;
     output Y;
     
@@ -16,9 +24,9 @@ endmodule
 `endcelldefine
 
 `celldefine
-module AND4X1 (A, B, C, D, Y);
-    input A, B, C, D;
-    output Y;
+module AND4X1 (IN1, IN2, IN3, IN4, Q);
+    input IN1, IN2, IN3, IN4;
+    output Q;
     
 endmodule
 `endcelldefine
@@ -56,33 +64,33 @@ endmodule
 `endcelldefine
 
 `celldefine
-module AOI21X1 (IN1, IN2, IN3, Q);
+module AOI21X1 (IN1, IN2, IN3, QN);
     input IN1, IN2, IN3;
-    output Q;
+    output QN;
     
 endmodule
 `endcelldefine
 
 `celldefine
-module AOI221X1 (IN1, IN2, IN3, IN4, IN5, Q);
+module AOI221X1 (IN1, IN2, IN3, IN4, IN5, QN);
     input IN1, IN2, IN3, IN4, IN5;
-    output Q;
+    output QN;
     
 endmodule
 `endcelldefine
 
 `celldefine
-module AOI222X1 (IN1, IN2, IN3, IN4, IN5, IN6, Q);
+module AOI222X1 (IN1, IN2, IN3, IN4, IN5, IN6, QN);
     input IN1, IN2, IN3, IN4, IN5, IN6;
-    output Q;
+    output QN;
     
 endmodule
 `endcelldefine
 
 `celldefine
-module AOI22X1 (IN1, IN2, IN3, IN4 Q);
+module AOI22X1 (IN1, IN2, IN3, IN4, QN);
     input IN1, IN2, IN3, IN4;
-    output Q;
+    output QN;
     
 endmodule
 `endcelldefine
@@ -104,6 +112,14 @@ endmodule
 `endcelldefine
 
 `celldefine
+module DFFX2_N (CLK, D, QN);
+    input CLK, D;
+    output QN;
+    
+endmodule
+`endcelldefine
+
+`celldefine
 module INVX0 (IN, QN);
     input IN;
     output QN;
@@ -115,6 +131,14 @@ endmodule
 module INVX1 (A, Y);
     input A;
     output Y;
+    
+endmodule
+`endcelldefine
+
+`celldefine
+module INVX8_S (IN, QN);
+    input IN;
+    output QN;
     
 endmodule
 `endcelldefine
@@ -232,9 +256,9 @@ endmodule
 `endcelldefine
 
 `celldefine
-module NAND4X1 (A, B, C, D, Y);
-    input A, B, C, D;
-    output Y;
+module NAND4X1 (IN1, IN2, IN3, IN4, QN);
+    input IN1, IN2, IN3, IN4;
+    output QN;
     
 endmodule
 `endcelldefine
@@ -280,7 +304,15 @@ endmodule
 `endcelldefine
 
 `celldefine
-module NOR3X1 (IN1, IN2, IN3, QN);
+module NOR3X1 (IN1, IN2, IN3, Q);
+    input IN1, IN2, IN3;
+    output Q;
+    
+endmodule
+`endcelldefine
+
+`celldefine
+module NORI3X1 (IN1, IN2, IN3, QN);
     input IN1, IN2, IN3;
     output QN;
     
@@ -304,41 +336,43 @@ endmodule
 `endcelldefine
 
 `celldefine
-module OA21X1 (IN1, IN2, IN3, QN);
+module OA21X1 (IN1, IN2, IN3, Q);
     input IN1, IN2, IN3;
-    output QN;
+    output Q;
     
 endmodule
 `endcelldefine
 
 `celldefine
-module OA221X1 (IN1, IN2, IN3, IN4, IN5, QN);
+module OA221X1 (IN1, IN2, IN3, IN4, IN5, Q);
     input IN1, IN2, IN3, IN4, IN5;
-    output QN;
+    output Q;
     
 endmodule
 `endcelldefine
 
-`celldefine
-module OA221X1 (IN1, IN2, IN3, IN4, IN5, QN);
-    input IN1, IN2, IN3, IN4, IN5;
-    output QN;
-    
-endmodule
-`endcelldefine
+
 
 `celldefine
-module OA222X1 (IN1, IN2, IN3, IN4, IN5, IN6, QN);
+module OA222X1 (IN1, IN2, IN3, IN4, IN5, IN6, Q);
     input IN1, IN2, IN3, IN4, IN5, IN6;
-    output QN;
+    output Q;
     
 endmodule
 `endcelldefine
 
 `celldefine
-module OA22X1 (IN1, IN2, IN3, IN4, QN);
+module OA22X1 (IN1, IN2, IN3, IN4, Q);
     input IN1, IN2, IN3, IN4;
-    output QN;
+    output Q;
+    
+endmodule
+`endcelldefine
+
+`celldefine
+module OA22X1_S38584 (IN1, IN2, IN3, IN4, Q);
+    input IN1, IN2, IN3, IN4;
+    output Q;
     
 endmodule
 `endcelldefine
@@ -384,25 +418,25 @@ endmodule
 `endcelldefine
 
 `celldefine
-module OR2X1 (IN1, IN2, QN);
+module OR2X1 (IN1, IN2, Q);
     input IN1, IN2;
-    output QN;
+    output Q;
     
 endmodule
 `endcelldefine
 
 `celldefine
-module OR3X1 (IN1, IN2, IN3, QN);
+module OR3X1 (IN1, IN2, IN3, Q);
     input IN1, IN2, IN3;
-    output QN;
+    output Q;
     
 endmodule
 `endcelldefine
 
 `celldefine
-module OR4X1 (IN1, IN2, IN3, IN4, QN);
+module OR4X1 (IN1, IN2, IN3, IN4, Q);
     input IN1, IN2, IN3, IN4;
-    output QN;
+    output Q;
     
 endmodule
 `endcelldefine
@@ -432,33 +466,33 @@ endmodule
 `endcelldefine
 
 `celldefine
-module XNOR2X1 (IN1, IN2, QN);
+module XNOR2X1 (IN1, IN2, Q);
     input IN1, IN2;
-    output QN;
+    output Q;
     
 endmodule
 `endcelldefine
 
 `celldefine
-module XNOR3X1 (IN1, IN2, IN3, QN);
+module XNOR3X1 (IN1, IN2, IN3, Q);
     input IN1, IN2, IN3;
-    output QN;
+    output Q;
     
 endmodule
 `endcelldefine
 
 `celldefine
-module XOR2X1 (IN1, IN2, QN);
+module XOR2X1 (IN1, IN2, Q);
     input IN1, IN2;
-    output QN;
+    output Q;
     
 endmodule
 `endcelldefine
 
 `celldefine
-module XOR3X1 (IN1, IN2, IN3, QN);
+module XOR3X1 (IN1, IN2, IN3, Q);
     input IN1, IN2, IN3;
-    output QN;
+    output Q;
     
 endmodule
 `endcelldefine
@@ -789,7 +823,7 @@ endmodule
 `endcelldefine
 
 `celldefine
-module AOI221X1_RS (A0, A1, B0, B1, Y);
+module AOI22X1_RS (A0, A1, B0, B1, Y);
     input A0, A1, B0, B1;
     output Y;
     
@@ -885,8 +919,24 @@ endmodule
 `endcelldefine
 
 `celldefine
-module NAND3X1 (A, B, C, Y);
+module NAND3X1_RS (A, B, C, Y);
     input A, B, C;
+    output Y;
+    
+endmodule
+`endcelldefine
+
+`celldefine
+module AND2X1_RS (A, B, Y);
+    input A, B;
+    output Y;
+    
+endmodule
+`endcelldefine
+
+`celldefine
+module BUFX1_RS (A, Y);
+    input A;
     output Y;
     
 endmodule

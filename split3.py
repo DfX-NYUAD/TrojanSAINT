@@ -31,8 +31,8 @@ args = parser.parse_args()
 
 files = sorted(os.listdir('.'))
 files.remove('split3.py')
-files.remove('split2.py')
-files.remove('split.py')
+# files.remove('split2.py')
+# files.remove('split.py')
 test = files[args.position]
 del files[args.position]
 
