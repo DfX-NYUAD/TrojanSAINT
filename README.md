@@ -29,6 +29,6 @@ Note that the script needs `verilog_lib.v` in the same directory. Once it is run
 
 ## Training and Inference with GraphSAINT
 
-Training and inference is done on GraphSAINT, which you can clone from [here](https://github.com/GraphSAINT/GraphSAINT)
+Training and inference is done on GraphSAINT, which is included here as submodule.
 
-We make slight modifications to the `graphsaint/pytorch_version/train.py` file to save the outputs, and we include the modified version in this repo, so replace the GraphSAINT version with this new file. To run training, simply follow the instructions on the GraphSAINT repository using the new files and the `DATE21.yaml`
+We make slight modifications to the `graphsaint/pytorch_version/train.py` file to save the outputs, and we include the modified version in this repo, so make sure to use this submodule here. To run training, simply follow the instructions on the GraphSAINT repository using the new files and the `DATE21.yaml`
